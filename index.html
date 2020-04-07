@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+	<style>
+	.container{
+		margin: 0 auto;
+		width: 1170px;
+	}
+	.header-flex{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 100px;
+		border-bottom: 1px solid #000;
+	}
+	.main{
+
+	}
+	.main-right__dots{
+		display: flex;
+		justify-content: center;
+	}
+	.main-right__dots div{
+		margin-right: 10px;
+		font-size: 20px;
+	}
+	.main-right__dots .active{
+		color: red;
+	}
+	.main-right__dots .no-active{
+		color: green;
+	}
+	.main-flex{
+		display: flex;
+		justify-content: space-between;
+		background: #dedede;
+		padding: 50px 0;
+	}
+	.main-left,
+	.main-right{
+		width: 50%;
+	}
+	.main-left{
+		border-right: 1px solid;
+		width: 40%;
+
+	}
+	.main-right{
+		padding-left: 30px;
+		width: 60%;
+	}
+	</style>
+</head>
+<body>
+
+<div id="app">
+    <header class="header">
+        <div class="container">
+            <div class="header-flex">
+                <div>Logo</div>
+                <a href="#" class="header-phone">8 499 777 77 77</a>
+            </div>
+        </div>
+    </header>
+    <div class="main">
+        <div class="container">
+            <div class="main-flex">
+                <div class="main-left">
+                    <div>Поделитесь вашим мнением о наборе и получите подарок</div>
+                    <p style="text-align: center;">До подарка осталось:</p>
+                    <p style="text-align: center;">{{questionLeft}}</p>
+                    <p style="text-align: center;">вопросов</p>
+                </div>
+                <div class="main-right">
+                    <div class="h1">{{quiz.title}}</div>
+                    <div v-for="(question, index) in quiz.questions">
+                        <div v-if="index === questionIndex">
+                            <h2>{{ question.text }}</h2>
+                            <div class="main-right__dots">
+                                <div v-for="dot in quiz.questions.length" :class="dot - 1 === questionIndex ? 'active' : 'no-active'">{{dot}}</div>
+                            </div>
+                            <ol>
+                                <li v-for="response in question.responses">
+                                    <label>
+                                        <input :name="index" type="radio" :value="response.correct" v-model="result[index].val" @change="answerSelected(response.correct, question.id)"> {{response.answer}}
+                                    </label>
+                                </li>
+                            </ol>
+                            <button v-if="questionIndex > 0" @click="prev()">Предыдущий</button>
+                            <button @click="next(question,index)" :disabled="result[index] === undefined">Следующий</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    var quiz = {
+        title: 'Моя викторина',
+        questions: [
+            {
+                id: 1,
+                text: "Вопрос 1",
+                responses: [
+                    {answer: "Да", correct: true},
+                    {answer: "Нет!", correct: false},
+                ]
+            },
+            {
+                id: 2,
+                text: "Вопрос 2",
+                responses: [
+                    {answer: "Да", correct: true},
+                    {answer: "Нет", correct: false},
+                ]
+            },
+            {
+                id: 3,
+                text: "Вопрос 3",
+                responses: [
+                    {answer: "Да", correct: true},
+                    {answer: "Нет!", correct: false},
+                ]
+            },
+            {
+                id: 4,
+                text: "Вопрос 4",
+                responses: [
+                    {answer: "Да", correct: true},
+                    {answer: "Нет", correct: false},
+                ]
+            }
+        ]
+    };
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return{
+                quiz: quiz,
+                questionIndex: 0,
+                result: {},
+                questionLeft: quiz.questions.length
+            }
+        },
+        methods: {
+            next(e,ind) {
+                this.questionIndex++;
+                this.questionLeft--;
+            },
+            prev() {
+               this.questionIndex--;
+               this.questionLeft++;
+            },
+            answerSelected(qust, qustId) {
+                this.result[qustId - 1] = {'id':qustId, 'val':qust};
+            }
+        },
+        beforeMount: function () {
+            console.log('result',this.result);
+            Array.from(quiz.questions).forEach((item, index) => {
+                this.result[index] = {'id': item.id,'val': null}
+            })
+        }
+    })
+</script>
+</body>
+</html>
